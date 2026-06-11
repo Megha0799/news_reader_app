@@ -256,4 +256,66 @@ final prefs = await SharedPreferences.getInstance();
                                   ScreenUtils.paddingS,
                                 ),
                                 top: ScreenUtils.getVerticalSize(
-                                  con
+                                  context,
+                                  ScreenUtils.heightXS,
+                                ),
+                              ),
+                              child: Text(
+                                _passwordError!,
+                                style: TextStyle(
+                                  fontFamily: CustomStyles.primaryFont,
+                                  color: AppColor.redColor,
+                                  fontSize: ScreenUtils.getFontSize(
+                                    context,
+                                    CustomStyles.size12,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                          
+                        ],
+                      ),
+                     
+                      SizedBox(
+                        height: ScreenUtils.getVerticalSize(
+                          context,
+                          ScreenUtils.heightL,
+                        ),
+                      ),
+                      CustomButton(
+                         textColor: Colors.white,
+                        fontSize: ScreenUtils.getFontSize(
+                          context,
+                          CustomStyles.size18,
+                        ),
+                        height: ScreenUtils.getVerticalSize(context, 50),
+                        onPressed: _handleLogin,
+                        text: 'Login',
+                      ),
+                     
+                      SizedBox(
+                        height: ScreenUtils.getVerticalSize(
+                          context,
+                          ScreenUtils.heightL,
+                        ),
+                      ),
+                    SizedBox(
+                        height: ScreenUtils.getVerticalSize(
+                          context,
+                          ScreenUtils.heightM,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      
+    );
+  }
+
+
+}
