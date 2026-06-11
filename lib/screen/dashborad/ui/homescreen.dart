@@ -10,6 +10,7 @@ import 'package:news_reader_app/common/widgets/common_style.dart';
 import 'package:news_reader_app/screen/bookmark/data/provider/bookmark_provider.dart';
 import 'package:news_reader_app/screen/dashborad/data/model/news_model.dart';
 import 'package:news_reader_app/screen/dashborad/data/provider/news_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
@@ -22,14 +23,7 @@ class HomeScreen extends ConsumerWidget {
     context.go('/');
   }
 
-  void _handleViewWSJArticle(BuildContext context, Article article) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Opening WSJ article: ${article.title}'),
-        backgroundColor: AppColor.primaryColor,
-      ),
-    );
-  }
+ 
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,7 +34,7 @@ class HomeScreen extends ConsumerWidget {
       key: _scaffoldKey,
       backgroundColor: AppColor.bodyColor,
       appBar: CustomAppBar(
-        title: 'News Reader',
+        title: 'DashBorad',
         menuicon: true,
         onPressed: () {
           _scaffoldKey.currentState?.openDrawer();
@@ -110,102 +104,141 @@ class HomeScreen extends ConsumerWidget {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: Container(
-        color: AppColor.backgroundColor,
-        child: CustomScrollView(
-          physics: const ClampingScrollPhysics(),
-          slivers: [
-            // Top content: Header
-            SliverToBoxAdapter(
-              child: DrawerHeader(
-                decoration: BoxDecoration(color: AppColor.primaryColor),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: AppColor.backgroundColor,
-                      child: Icon(
-                        Icons.person,
-                        size: 40,
-                        color: AppColor.primaryColor,
-                      ),
-                    ),
-                    SizedBox(
-                      height: ScreenUtils.getVerticalSize(
-                        context,
-                        ScreenUtils.heightM,
-                      ),
-                    ),
-                    Text(
-                      'John Doe',
-                      style: CustomStyles.boldTextStyle(
-                        color: AppColor.backgroundColor,
-                        fontSize: ScreenUtils.getFontSize(
-                          context,
-                          CustomStyles.size18,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: ScreenUtils.getVerticalSize(
-                        context,
-                        ScreenUtils.heightXS,
-                      ),
-                    ),
-                    Text(
-                      'john.doe@example.com',
-                      style: CustomStyles.regularTextStyle(
-                        color: AppColor.backgroundColor,
-                        fontSize: ScreenUtils.getFontSize(
-                          context,
-                          CustomStyles.size14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const Divider(),
-                  ListTile(
-                    leading: Icon(Icons.logout, color: AppColor.redColor),
-                    title: Text(
-                      'Logout',
-                      style: CustomStyles.mediumTextStyle(
-                        color: AppColor.redColor,
-                        fontSize: ScreenUtils.getFontSize(
-                          context,
-                          CustomStyles.size16,
-                        ),
-                      ),
-                    ),
-                    onTap: () {
-                      context.pop();
-                      _handleLogout(context);
-                    },
-                  ),
-
-                  SizedBox(height: MediaQuery.of(context).padding.bottom),
-                ],
-              ),
-            ),
-          ],
+   
+    floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        child: FloatingActionButton.extended(
+          onPressed:(){
+            GoRouter.of(context).push('/wall-street-journal');
+          },
+          backgroundColor: AppColor.primaryColor,
+          foregroundColor: AppColor.backgroundColor,
+          elevation: 4,
+          icon: const Icon(Icons.add),
+          // isExtended: _isFabExtended,
+          label: const Text('WSJournal'),
         ),
       ),
-    );
+     );
   }
+
+ 
+
+Widget _buildDrawer(BuildContext context) {
+  // 1. Define a helper function to fetch your data map
+  Future<Map<String, String>> _getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'name': prefs.getString('store_name') ?? 'Guest User',
+      'email': prefs.getString('user_email') ?? 'guest@example.com',
+    };
+  }
+
+  return Drawer(
+    child: Container(
+      color: AppColor.backgroundColor,
+      child: CustomScrollView(
+        physics: const ClampingScrollPhysics(),
+        slivers: [
+          // Top content: Header
+          SliverToBoxAdapter(
+            // 2. Wrap your DrawerHeader content with a FutureBuilder
+            child: FutureBuilder<Map<String, String>>(
+              future: _getUserData(),
+              builder: (context, snapshot) {
+                // Fallback text while loading or if data is null
+                final name = snapshot.data?['name'] ?? 'Loading...';
+                final email = snapshot.data?['email'] ?? 'Loading...';
+
+                return DrawerHeader(
+                  decoration: BoxDecoration(color: AppColor.primaryColor),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: AppColor.backgroundColor,
+                        child: Icon(
+                          Icons.person,
+                          size: 40,
+                          color: AppColor.primaryColor,
+                        ),
+                      ),
+                      SizedBox(
+                        height: ScreenUtils.getVerticalSize(
+                          context,
+                          ScreenUtils.heightM,
+                        ),
+                      ),
+                      // 3. Display the dynamic store name
+                      Text(
+                        name,
+                        style: CustomStyles.boldTextStyle(
+                          color: AppColor.backgroundColor,
+                          fontSize: ScreenUtils.getFontSize(
+                            context,
+                            CustomStyles.size18,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: ScreenUtils.getVerticalSize(
+                          context,
+                          ScreenUtils.heightXS,
+                        ),
+                      ),
+                      // 4. Display the dynamic email address
+                      Text(
+                        email,
+                        style: CustomStyles.regularTextStyle(
+                          color: AppColor.backgroundColor,
+                          fontSize: ScreenUtils.getFontSize(
+                            context,
+                            CustomStyles.size14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Divider(),
+                ListTile(
+                  leading: Icon(Icons.logout, color: AppColor.redColor),
+                  title: Text(
+                    'Logout',
+                    style: CustomStyles.mediumTextStyle(
+                      color: AppColor.redColor,
+                      fontSize: ScreenUtils.getFontSize(
+                        context,
+                        CustomStyles.size16,
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    context.pop();
+                    _handleLogout(context);
+                  },
+                ),
+                SizedBox(height: MediaQuery.of(context).padding.bottom),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   Widget _buildArticleCard(
     BuildContext context,

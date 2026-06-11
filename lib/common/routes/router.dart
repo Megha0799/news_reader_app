@@ -4,6 +4,7 @@ import 'package:news_reader_app/screen/auth/login/ui/loginscreen.dart';
 import 'package:news_reader_app/screen/bookmark/ui/bookmark.dart';
 import 'package:news_reader_app/screen/dashborad/data/model/news_model.dart';
 import 'package:news_reader_app/screen/dashborad/ui/homescreen.dart';
+import 'package:news_reader_app/screen/wall_street_journal_articles/ui/wall_street_journal_articles.dart';
 
 
 
@@ -17,7 +18,8 @@ final router = GoRouter(
       // ),
       GoRoute(
         path: '/',
-        builder: (context, state) =>  HomeScreen(),
+        // home
+        builder: (context, state) => HomeScreen(),
       ),
       GoRoute(
         path: '/article-detail',
@@ -30,8 +32,10 @@ final router = GoRouter(
         path: '/bookmark',
         builder: (context, state) => const BookMarkScreen(),
       ),
-
-
+      GoRoute(
+        path: '/wall-street-journal',
+        builder: (context, state) => WallStreetJournalArticles(),
+      ),
     ]);
 
     
